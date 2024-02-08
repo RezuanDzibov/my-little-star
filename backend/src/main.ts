@@ -6,7 +6,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   const config = new DocumentBuilder()
-    .setTitle('My Little Start')
+    .setTitle('My Little Star')
     .setDescription('Service to watch movies, series etc together')
     .setVersion('0.1.0')
     .build();
