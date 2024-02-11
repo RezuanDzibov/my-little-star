@@ -1,18 +1,19 @@
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
+import globalConfig from './config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   const config = new DocumentBuilder()
-    .setTitle('My Little Star')
-    .setDescription('Service to watch movies, series etc together')
-    .setVersion('0.1.0')
+    .setTitle(globalConfig.PROJECT_NAME)
+    .setDescription(globalConfig.PROJECT_DESCRIPTION)
+    .setVersion(globalConfig.PROJECT_VERSION)
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
-  await app.listen(8000);
+  await app.listen(globalConfig.BACKEND_API_PORT);
 }
 bootstrap();
