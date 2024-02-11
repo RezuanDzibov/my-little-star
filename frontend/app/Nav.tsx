@@ -1,8 +1,11 @@
 import Link from "next/link";
 import Image from "next/image";
 import NavSearch from "./NavSearch";
+import { unstable_noStore } from "next/cache";
 
 export default function Nav() {
+  unstable_noStore();
+
   return (
     <header className="flex justify-center my-6">
       <div className="flex flex-col gap-4 md:flex-row w-5/6 h-18 pt-4 pb-4 px-6 md:py-4 items-center justify-between backdrop-blur-md bg-white/15 rounded-full shadow-md">
@@ -13,10 +16,10 @@ export default function Nav() {
             height={36}
             alt="logo"
           />
-          <h1 className="text-lg">My Little Star</h1>
+          <h1 className="text-lg">{ process.env.PROJECT_NAME }</h1>
         </Link>
         <NavSearch/> 
       </div>
-    </header> 
+    </header>
   );
 }
