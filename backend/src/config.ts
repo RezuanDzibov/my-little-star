@@ -9,6 +9,8 @@ interface ENV {
   PROJECT_DESCRIPTION: string | undefined;
   PROJECT_VERSION: string | undefined;
   BACKEND_API_PORT: number | undefined;
+  KINOPOISK_API_KEY: string | undefined;
+  KINOPOISK_API_URI: string | undefined;
 }
 
 interface Config {
@@ -22,6 +24,8 @@ interface Config {
   PROJECT_DESCRIPTION: string;
   PROJECT_VERSION: string;
   BACKEND_API_PORT: number;
+  KINOPOISK_API_KEY: string;
+  KINOPOISK_API_URI: string;
 }
 
 const getConfig = (): ENV => {
@@ -40,6 +44,8 @@ const getConfig = (): ENV => {
     BACKEND_API_PORT: process.env.BACKEND_API_PORT
       ? Number(process.env.BACKEND_API_PORT)
       : undefined,
+    KINOPOISK_API_KEY: process.env.KINOPOISK_API_KEY,
+    KINOPOISK_API_URI: process.env.KINOPOISK_API_URI,
   };
 };
 
