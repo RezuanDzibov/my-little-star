@@ -32,9 +32,11 @@ services:
       - .env
     restart: always
     build: ./backend
+    volumes:
+      - ./backend/:/usr/src/app
     ports:
       - ${BACKEND_API_PORT}:${BACKEND_API_PORT}
-    command: [ "node", "dist/main" ]
+    command: yarn start:dev
 
   frontend:
     container_name: mls_front
@@ -49,10 +51,14 @@ services:
       - PORT=${FRONTEND_WEBAPP_PORT}
       - HOSTNAME=${FRONTEND_WEBAPP_HOSTNAME}
     restart: always
-    build: ./frontend
-    ports: 
+    build:
+      ./frontend
+    volumes:
+      - ./frontend:/app
+    ports:
       - ${FRONTEND_WEBAPP_PORT}:${FRONTEND_WEBAPP_PORT}
-    command: [ "node", "server.js" ]
+    command: yarn run dev
+
 
 volumes:
   mls_postgres_data:
