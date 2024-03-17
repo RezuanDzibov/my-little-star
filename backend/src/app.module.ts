@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
-import { MoviesModule } from './movies/movies.module';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TypeOrmConfigService } from '@/config/database.config';
@@ -18,7 +17,6 @@ import { UsersModule } from './users/users.module';
     ServeStaticModule.forRoot({
       rootPath: resolve(__dirname, '..', 'public'),
     }),
-    MoviesModule,
     UsersModule,
   ],
   controllers: [AppController],
