@@ -24,7 +24,7 @@ export class UsersController {
   })
   @ApiCreatedResponse({ type: ResponseCreatedUserDto })
   async create(@Body() createUserDto: CreateUserDto) {
-    return createUserDto;
+    return this.usersService.create(createUserDto);
   }
 
   @Get()

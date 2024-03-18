@@ -10,4 +10,7 @@ export class CreateUserDto extends PickType(User, [
 export class ResponseCreatedUserDto extends PickType(User, [
   'username',
   'email',
+  'createdAt',
+  'updatedAt',
+  'id',
 ]) {}
