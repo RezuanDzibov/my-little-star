@@ -6,6 +6,7 @@ import { User } from '@/users/entities/user.entity';
 import { Repository } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
 import { UserHelpers } from '@/users/user.helpers';
+import {PaginateDto} from "@/common/dto/paginate.dto";
 
 @Injectable()
 export class UsersService {
@@ -52,8 +53,20 @@ export class UsersService {
     return restCreatedUser;
   }
 
-  findAll() {
-    return `This action returns all users`;
+  async findAll(paginateUserDto: PaginateDto) {
+    const { page, limit } = paginateUserDto;
+
+    const [users, count] = await this.userRepository.findAndCount({
+      skip: Math.max(0, page - 1) * limit,
+      take: limit,
+      select: ['id', 'username', 'email', 'createdAt', 'updatedAt']
+    });
+
+    return {
+      users,
+      count,
+      page,
+    };
   }
 
   async findOne(userId: string) {
