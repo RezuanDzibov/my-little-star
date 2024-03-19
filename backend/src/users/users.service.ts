@@ -56,8 +56,12 @@ export class UsersService {
     return `This action returns all users`;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findOne(userId: string) {
+    const foundUser = await this.userHelpers.getUserById(userId);
+
+    const { password, deletedAt, ...restUser } = foundUser;
+
+    return restUser;
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {

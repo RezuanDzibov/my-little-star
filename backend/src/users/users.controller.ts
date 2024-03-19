@@ -5,12 +5,12 @@ import {
   Body,
   Patch,
   Param,
-  Delete,
+  Delete, ParseUUIDPipe,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto, ResponseCreatedUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiTags} from '@nestjs/swagger';
 
 @ApiTags('users')
 @Controller('users')
@@ -20,7 +20,7 @@ export class UsersController {
   @Post()
   @ApiOperation({
     summary: 'Create new User',
-    description: 'Endpoint creates new user and profile for it',
+    description: 'Endpoint creates new User',
   })
   @ApiCreatedResponse({ type: ResponseCreatedUserDto })
   async create(@Body() createUserDto: CreateUserDto) {
@@ -33,8 +33,13 @@ export class UsersController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(+id);
+  @ApiOperation({
+    summary: 'Retrieve User',
+    description: 'Endpoint to retrieve User'
+  })
+  @ApiOkResponse({ type: ResponseCreatedUserDto })
+  async findOne(@Param('id', new ParseUUIDPipe({version: '4'})) userId: string) {
+    return this.usersService.findOne(userId);
   }
 
   @Patch(':id')
