@@ -13,6 +13,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import {ApiCreatedResponse, ApiNoContentResponse, ApiOkResponse, ApiOperation, ApiTags} from '@nestjs/swagger';
 import {PaginateDto} from "@/common/dto/paginate.dto";
 import {ResponsePaginatedUsersDto} from "@/users/dto/paginated-user.dto";
+import {MessageDto} from "@/common/dto/message.dto";
 
 @ApiTags('users')
 @Controller('users')
@@ -42,7 +43,7 @@ export class UsersController {
   @Get(':id')
   @ApiOperation({
     summary: 'Retrieve User',
-    description: 'Endpoint to retrieve User'
+    description: 'Endpoint to retrieve User',
   })
   @ApiOkResponse({ type: ResponseCreatedUserDto })
   async findOne(@Param('id', new ParseUUIDPipe({version: '4'})) userId: string) {
@@ -50,8 +51,18 @@ export class UsersController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(+id, updateUserDto);
+  @ApiOperation({
+      summary: 'Update User',
+      description: 'Endpoint to update User',
+  })
+  @ApiOkResponse({
+      description: 'User successfully updated',
+      type: MessageDto,
+  })
+  async update(@Param('id', new ParseUUIDPipe({version: '4'})) userId: string, @Body() updateUserDto: UpdateUserDto) {
+    await this.usersService.update(userId, updateUserDto);
+
+    return { message: 'User successfully updated' }
   }
 
   @Delete(':id')
@@ -60,7 +71,8 @@ export class UsersController {
       description: 'Delete User',
   })
   @ApiNoContentResponse({
-      description: 'User successfully deleted'
+      description: 'User successfully deleted',
+      type: MessageDto,
   })
   async remove(@Param('id', new ParseUUIDPipe({ version: '4' })) userId: string) {
     await this.usersService.remove(userId);

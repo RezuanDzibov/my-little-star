@@ -1,4 +1,4 @@
-import {ConflictException, Injectable, NotFoundException} from '@nestjs/common';
+import {ConflictException, Injectable, NotFoundException, UnprocessableEntityException} from '@nestjs/common';
 import { CreateUserDto, ResponseCreatedUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -77,8 +77,23 @@ export class UsersService {
     return restUser;
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async update(userId: string, updateUserDto: UpdateUserDto) {
+    const foundUser = await this.userHelpers.getUserById(userId);
+
+    if (!foundUser) {
+      throw new ConflictException('User with username or email already exists');
+    }
+
+    const updatedUser  = this.userRepository.create({...foundUser, ...updateUserDto})
+
+    if (updateUserDto?.password) {
+      updatedUser.password = await this.userHelpers.hashPassword(
+          updateUserDto.password,
+          this.saltOrRounds,
+      );
+    }
+
+    return updatedUser.save();
   }
 
   async remove(userId: string) {
