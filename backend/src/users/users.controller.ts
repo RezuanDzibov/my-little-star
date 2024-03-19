@@ -10,7 +10,7 @@ import {
 import { UsersService } from './users.service';
 import { CreateUserDto, ResponseCreatedUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import {ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiTags} from '@nestjs/swagger';
+import {ApiCreatedResponse, ApiNoContentResponse, ApiOkResponse, ApiOperation, ApiTags} from '@nestjs/swagger';
 import {PaginateDto} from "@/common/dto/paginate.dto";
 import {ResponsePaginatedUsersDto} from "@/users/dto/paginated-user.dto";
 
@@ -55,7 +55,16 @@ export class UsersController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(+id);
+  @ApiOperation({
+      summary: 'Delete User',
+      description: 'Delete User',
+  })
+  @ApiNoContentResponse({
+      description: 'User successfully deleted'
+  })
+  async remove(@Param('id', new ParseUUIDPipe({ version: '4' })) userId: string) {
+    await this.usersService.remove(userId);
+
+    return { message: 'User successfully deleted' }
   }
 }

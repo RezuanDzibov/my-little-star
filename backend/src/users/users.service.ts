@@ -1,4 +1,4 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import {ConflictException, Injectable, NotFoundException} from '@nestjs/common';
 import { CreateUserDto, ResponseCreatedUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -81,7 +81,15 @@ export class UsersService {
     return `This action updates a #${id} user`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async remove(userId: string) {
+    const foundUser = await this.userHelpers.getUserById(userId);
+
+    if (!foundUser) {
+      throw new NotFoundException(`User with id: ${userId} not found`);
+    }
+
+    await foundUser.remove();
+
+    return true;
   }
 }
