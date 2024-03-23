@@ -1,5 +1,4 @@
 import { Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
-import { CommonEntity } from '@/common/common.entity';
 import { ApiProperty } from '@nestjs/swagger';
 import {
   IsEmail,
@@ -9,6 +8,8 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
+
+import { CommonEntity } from '@/common/common.entity';
 
 @Entity()
 export class User extends CommonEntity {

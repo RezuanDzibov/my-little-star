@@ -6,6 +6,7 @@ import { TypeOrmConfigService } from '@/config/database.config';
 import { resolve } from 'path';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { UsersModule } from './users/users.module';
+import {AuthModule} from "@/auth/auth.module";
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { UsersModule } from './users/users.module';
       rootPath: resolve(__dirname, '..', 'public'),
     }),
     UsersModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [],

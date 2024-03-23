@@ -1,12 +1,17 @@
-import {ConflictException, Injectable, NotFoundException, UnprocessableEntityException} from '@nestjs/common';
-import { CreateUserDto, ResponseCreatedUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from '@/users/entities/user.entity';
 import { Repository } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
+
+import { PaginateDto } from '@/common/dto/paginate.dto';
 import { UserHelpers } from '@/users/user.helpers';
-import {PaginateDto} from "@/common/dto/paginate.dto";
+import { User } from '@/users/entities/user.entity';
+import { CreateUserDto } from '@/users/dto/create-user.dto';
+import { UpdateUserDto } from '@/users/dto/update-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -20,11 +25,8 @@ export class UsersService {
   private saltOrRounds: number =
     +this.configService.getOrThrow('SALT_OR_ROUNDS');
 
-  async create({
-    username,
-    email,
-    ...restUser
-  }: CreateUserDto): Promise<ResponseCreatedUserDto> {
+  async create({ username, email, ...restUser }: CreateUserDto): Promise<User> {
+
     const foundUser = await this.userRepository.findOne({
       where: [{ username }, { email }],
     });
@@ -40,17 +42,14 @@ export class UsersService {
       this.saltOrRounds,
     );
 
-    const createdUser = await this.userRepository.save({
-      username,
-      email,
-      ...restUser,
-      password: hashedPassword,
-    });
-
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { password, deletedAt, ...restCreatedUser } = createdUser;
-
-    return restCreatedUser;
+    return this.userRepository
+      .create({
+        username,
+        email,
+        ...restUser,
+        password: hashedPassword,
+      })
+      .save();
   }
 
   async findAll(paginateUserDto: PaginateDto) {
@@ -59,7 +58,7 @@ export class UsersService {
     const [users, count] = await this.userRepository.findAndCount({
       skip: Math.max(0, page - 1) * limit,
       take: limit,
-      select: ['id', 'username', 'email', 'createdAt', 'updatedAt']
+      select: ['id', 'username', 'email', 'createdAt', 'updatedAt'],
     });
 
     return {
@@ -84,12 +83,15 @@ export class UsersService {
       throw new ConflictException('User with username or email already exists');
     }
 
-    const updatedUser  = this.userRepository.create({...foundUser, ...updateUserDto})
+    const updatedUser = this.userRepository.create({
+      ...foundUser,
+      ...updateUserDto,
+    });
 
     if (updateUserDto?.password) {
       updatedUser.password = await this.userHelpers.hashPassword(
-          updateUserDto.password,
-          this.saltOrRounds,
+        updateUserDto.password,
+        this.saltOrRounds,
       );
     }
 

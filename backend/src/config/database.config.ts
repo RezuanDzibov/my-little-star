@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { TypeOrmOptionsFactory, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { User } from '@/users/entities/user.entity';
+import {RefreshToken} from "@/auth/entities/refresh-tokens.entity";
 
 @Injectable()
 export class TypeOrmConfigService implements TypeOrmOptionsFactory {
@@ -15,7 +16,7 @@ export class TypeOrmConfigService implements TypeOrmOptionsFactory {
       username: this.configService.getOrThrow('POSTGRES_USER'),
       password: this.configService.getOrThrow('POSTGRES_PASSWORD'),
       database: this.configService.getOrThrow('POSTGRES_DB'),
-      entities: [User],
+      entities: [User, RefreshToken],
       synchronize:
         this.configService.getOrThrow('DATABASE_SYNCHRONIZE') === 'true',
     };
