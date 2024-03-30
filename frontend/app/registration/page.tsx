@@ -2,9 +2,9 @@
 
 import * as z from "zod";
 import axios from "axios";
-import {useForm} from "react-hook-form";
-import {zodResolver} from "@hookform/resolvers/zod";
-import {useRouter} from "next/navigation";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
 
 import {
   Form,
@@ -14,8 +14,8 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import {Input} from "@/components/ui/input";
-import {Button} from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import {registrationFormSchema} from "@/app/registration/registration.schema";
 import { Config } from "@/app/common/config/config"
 
@@ -32,6 +32,7 @@ export default function RegistrationPage () {
   const router = useRouter();
 
   const handleSubmit = async (schema: z.infer<typeof registrationFormSchema>) => {
+    console.log(Config.NEXT_PUBLIC_BACKEND_URI)
     axios.post(`${Config.NEXT_PUBLIC_BACKEND_URI}/auth/registration`, schema)
       .then(response => {
         if (response.status === 201) {
