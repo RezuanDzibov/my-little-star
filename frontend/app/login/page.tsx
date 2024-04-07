@@ -16,46 +16,57 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import {registrationFormSchema} from "@/app/registration/registration.schema";
+import { loginSchema } from "@/app/login/login.schema";
 import { Config } from "@/app/common/config/config"
+import {IJWTResponse} from "@/app/login/interfaces";
+import useAuth from "@/app/auth/auth.context";
 
-export default function RegistrationPage () {
-  const form = useForm<z.infer<typeof registrationFormSchema>>({
-    resolver: zodResolver(registrationFormSchema),
+export default function LoginPage() {
+  const form = useForm<z.infer<typeof loginSchema>>({
+    resolver: zodResolver(loginSchema),
     defaultValues: {
-      username: "",
-      email: "",
+      login: "",
       password: "",
     },
   });
 
   const router = useRouter();
+  const { setIsLoggedIn } = useAuth();
 
-  const handleSubmit = async (schema: z.infer<typeof registrationFormSchema>) => {
-    axios.post(`${Config.NEXT_PUBLIC_BACKEND_URI}/auth/registration`, schema)
+  const handleSubmit = async (schema: z.infer<typeof loginSchema>) => {
+    axios.post(`${Config.NEXT_PUBLIC_BACKEND_URI}/auth/login`, schema)
       .then(response => {
-        if (response.status === 201) {
-          router.push("/login");
+        if (response.status == 201) {
+          const data: IJWTResponse = response.data;
+
+          localStorage.setItem("accessToken", data.accessToken);
+
+          setIsLoggedIn(true);
+
+          router.push("/");
         }
       })
       .catch(error => {
-          if (axios.isAxiosError((error))) {
-            const {response} = error;
-            if (response && response.status === 409) {
-              const errorSections = document.getElementsByClassName("errorSection");
-              for (let i = 0; i < errorSections.length; i++) {
-                const errorSection = errorSections[i] as HTMLElement;
-                errorSection.textContent = "User with username or email already exists";
-                errorSection.classList.remove("hidden");
-              }
-            }
+        if (axios.isAxiosError(error)) {
+          const { response } = error;
+
+          if (response?.status === 404) {
+            const errorSection = document.getElementsByClassName('errorSection')[0];
+
+            errorSection.textContent = "User not found";
+            errorSection.classList.remove("hidden");
+          } else if (response?.status === 401) {
+            const errorSection = document.getElementsByClassName("errorSection")[0];
+
+            errorSection.textContent = "Your login or username invalid";
+            errorSection.classList.remove("hidden");
           }
         }
-      );
-  };
+      });
+  }
 
-  const onClickLogin = async () => {
-    router.push("/login")
+  const handleOnClickGoToRegistrationPage = async () => {
+    router.push("/registration")
   }
 
   return (
@@ -69,32 +80,17 @@ export default function RegistrationPage () {
           </div>
           <FormField
             control={form.control}
-            name="username"
+            name="login"
             render={({field}) => {
               return (
                 <FormItem>
-                  <FormLabel>Username</FormLabel>
+                  <FormLabel>Login</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="your username"
+                      placeholder="your login"
                       type="string"
                       {...field}
                     />
-                  </FormControl>
-                  <FormMessage/>
-                </FormItem>
-              );
-            }}
-          />
-          <FormField
-            control={form.control}
-            name="email"
-            render={({field}) => {
-              return (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input placeholder="your email" type="email" {...field} />
                   </FormControl>
                   <FormMessage/>
                 </FormItem>
@@ -118,12 +114,12 @@ export default function RegistrationPage () {
           />
           <div className="flex flex-col gap-4 items-center">
             <Button type="submit" className="w-full md:w-[50%]">
-              Register
+              Login
             </Button>
             <div className="flex flex-col items-center gap-4 md:w-[50%]">
               Already have an account?
-              <Button onClick={onClickLogin} className="w-full bg-green-600 hover:bg-green-700">
-                Login
+              <Button onClick={ handleOnClickGoToRegistrationPage } className="w-full bg-green-600 hover:bg-green-700">
+                Registration
               </Button>
             </div>
           </div>
@@ -131,4 +127,4 @@ export default function RegistrationPage () {
       </Form>
     </main>
   );
-};
+}
